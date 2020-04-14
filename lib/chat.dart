@@ -142,7 +142,7 @@ class ChatScreenState extends State<ChatScreen> {
   }
 
   void onSendMessage(String content, int type) {
-    // type: 0 = text, 1 = image, 2 = sticker
+    // type: 0 = text, 1 = image, 2 = sticker, 3 = online gif
     if (content.trim() != '') {
       textEditingController.clear();
 
@@ -429,27 +429,27 @@ class ChatScreenState extends State<ChatScreen> {
           Row(
             children: <Widget>[
               FlatButton(
-                onPressed: () => onSendMessage('mimi1', 2),
+                onPressed: () => onSendMessage('cat_nails', 2),
                 child: new Image.asset(
-                  'images/mimi1.gif',
+                  'images/cat_nails.gif',
                   width: 50.0,
                   height: 50.0,
                   fit: BoxFit.cover,
                 ),
               ),
               FlatButton(
-                onPressed: () => onSendMessage('mimi2', 2),
+                onPressed: () => onSendMessage('cat_fight', 2),
                 child: new Image.asset(
-                  'images/mimi2.gif',
+                  'images/cat_fight.gif',
                   width: 50.0,
                   height: 50.0,
                   fit: BoxFit.cover,
                 ),
               ),
               FlatButton(
-                onPressed: () => onSendMessage('mimi3', 2),
+                onPressed: () => onSendMessage('cat_keyboard', 2),
                 child: new Image.asset(
-                  'images/mimi3.gif',
+                  'images/cat_keyboard.gif',
                   width: 50.0,
                   height: 50.0,
                   fit: BoxFit.cover,
@@ -461,27 +461,27 @@ class ChatScreenState extends State<ChatScreen> {
           Row(
             children: <Widget>[
               FlatButton(
-                onPressed: () => onSendMessage('mimi4', 2),
+                onPressed: () => onSendMessage('cat_ready', 2),
                 child: new Image.asset(
-                  'images/mimi4.gif',
+                  'images/cat_ready.gif',
                   width: 50.0,
                   height: 50.0,
                   fit: BoxFit.cover,
                 ),
               ),
               FlatButton(
-                onPressed: () => onSendMessage('mimi5', 2),
+                onPressed: () => onSendMessage('cat_surprised', 2),
                 child: new Image.asset(
-                  'images/mimi5.gif',
+                  'images/cat_surprised.gif',
                   width: 50.0,
                   height: 50.0,
                   fit: BoxFit.cover,
                 ),
               ),
               FlatButton(
-                onPressed: () => onSendMessage('mimi6', 2),
+                onPressed: () => onSendMessage('cat_kiss', 2),
                 child: new Image.asset(
-                  'images/mimi6.gif',
+                  'images/cat_kiss.gif',
                   width: 50.0,
                   height: 50.0,
                   fit: BoxFit.cover,
@@ -490,38 +490,38 @@ class ChatScreenState extends State<ChatScreen> {
             ],
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           ),
-          Row(
-            children: <Widget>[
-              FlatButton(
-                onPressed: () => onSendMessage('mimi7', 2),
-                child: new Image.asset(
-                  'images/mimi7.gif',
-                  width: 50.0,
-                  height: 50.0,
-                  fit: BoxFit.cover,
-                ),
-              ),
-              FlatButton(
-                onPressed: () => onSendMessage('mimi8', 2),
-                child: new Image.asset(
-                  'images/mimi8.gif',
-                  width: 50.0,
-                  height: 50.0,
-                  fit: BoxFit.cover,
-                ),
-              ),
-              FlatButton(
-                onPressed: () => onSendMessage('mimi9', 2),
-                child: new Image.asset(
-                  'images/mimi9.gif',
-                  width: 50.0,
-                  height: 50.0,
-                  fit: BoxFit.cover,
-                ),
-              )
-            ],
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          )
+          // Row(
+          //   children: <Widget>[
+          //     FlatButton(
+          //       onPressed: () => onSendMessage('mimi7', 2),
+          //       child: new Image.asset(
+          //         'images/mimi7.gif',
+          //         width: 50.0,
+          //         height: 50.0,
+          //         fit: BoxFit.cover,
+          //       ),
+          //     ),
+          //     FlatButton(
+          //       onPressed: () => onSendMessage('mimi8', 2),
+          //       child: new Image.asset(
+          //         'images/mimi8.gif',
+          //         width: 50.0,
+          //         height: 50.0,
+          //         fit: BoxFit.cover,
+          //       ),
+          //     ),
+          //     FlatButton(
+          //       onPressed: () => onSendMessage('mimi9', 2),
+          //       child: new Image.asset(
+          //         'images/mimi9.gif',
+          //         width: 50.0,
+          //         height: 50.0,
+          //         fit: BoxFit.cover,
+          //       ),
+          //     )
+          //   ],
+          //   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          // )
         ],
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       ),
