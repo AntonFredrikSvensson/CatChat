@@ -2,14 +2,12 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:cat_chat/gifs.dart';
+import 'package:cat_chat/Services/chatService.dart';
+import 'package:cat_chat/models/gifs.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:cat_chat/const.dart';
 import 'package:cat_chat/fullPhoto.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -66,9 +64,7 @@ class ChatScreenState extends State<ChatScreen> {
   bool isShowSticker;
   String imageUrl;
 
-  final TextEditingController textEditingController =
-      new TextEditingController();
-  final ScrollController listScrollController = new ScrollController();
+  final ScrollController listScrollController = ScrollController();
   final FocusNode focusNode = new FocusNode();
 
   @override
@@ -111,72 +107,12 @@ class ChatScreenState extends State<ChatScreen> {
     setState(() {});
   }
 
-  Future getImage() async {
-    imageFile = await ImagePicker.pickImage(source: ImageSource.gallery);
-
-    if (imageFile != null) {
-      setState(() {
-        isLoading = true;
-      });
-      uploadFile();
-    }
-  }
-
   void getSticker() {
     // Hide keyboard when sticker appear
     focusNode.unfocus();
     setState(() {
       isShowSticker = !isShowSticker;
     });
-  }
-
-  Future uploadFile() async {
-    String fileName = DateTime.now().millisecondsSinceEpoch.toString();
-    StorageReference reference = FirebaseStorage.instance.ref().child(fileName);
-    StorageUploadTask uploadTask = reference.putFile(imageFile);
-    StorageTaskSnapshot storageTaskSnapshot = await uploadTask.onComplete;
-    storageTaskSnapshot.ref.getDownloadURL().then((downloadUrl) {
-      imageUrl = downloadUrl;
-      setState(() {
-        isLoading = false;
-        onSendMessage(imageUrl, 1);
-      });
-    }, onError: (err) {
-      setState(() {
-        isLoading = false;
-      });
-      Fluttertoast.showToast(msg: 'This file is not an image');
-    });
-  }
-
-  void onSendMessage(String content, int type) {
-    // type: 0 = text, 1 = image, 2 = sticker, 3 = online gif
-    if (content.trim() != '') {
-      textEditingController.clear();
-
-      var documentReference = Firestore.instance
-          .collection('messages')
-          .document(groupChatId)
-          .collection(groupChatId)
-          .document(DateTime.now().millisecondsSinceEpoch.toString());
-
-      Firestore.instance.runTransaction((transaction) async {
-        await transaction.set(
-          documentReference,
-          {
-            'idFrom': id,
-            'idTo': peerId,
-            'timestamp': DateTime.now().millisecondsSinceEpoch.toString(),
-            'content': content,
-            'type': type
-          },
-        );
-      });
-      listScrollController.animateTo(0.0,
-          duration: Duration(milliseconds: 300), curve: Curves.easeOut);
-    } else {
-      Fluttertoast.showToast(msg: 'Nothing to send');
-    }
   }
 
   Widget buildItem(int index, DocumentSnapshot document) {
@@ -489,12 +425,15 @@ class ChatScreenState extends State<ChatScreen> {
       child: GridView.count(
         crossAxisCount: 3,
         children: List.generate(gifsList.length, (index) {
-          return Center(
-            child: Image.network(
-              gifsList[index].url,
-              width: 100.0,
-              height: 100.0,
-              fit: BoxFit.cover,
+          return FlatButton(
+              onPressed: () => ChatService(id: id, peerId: peerId, groupChatId: groupChatId).sendMessage(gifsList[index].url, 3, listScrollController),
+              child: Center(
+              child: Image.network(
+                gifsList[index].url,
+                width: 100.0,
+                height: 100.0,
+                fit: BoxFit.cover,
+              ),
             ),
           );
         }),
@@ -525,52 +464,12 @@ class ChatScreenState extends State<ChatScreen> {
     return Container(
       child: Row(
         children: <Widget>[
-          // Button send image
           Material(
-            child: new Container(
-              margin: new EdgeInsets.symmetric(horizontal: 1.0),
-              child: new IconButton(
-                icon: new Icon(Icons.image),
-                onPressed: getImage,
-                color: primaryColor,
-              ),
-            ),
-            color: Colors.white,
-          ),
-          Material(
-            child: new Container(
-              margin: new EdgeInsets.symmetric(horizontal: 1.0),
-              child: new IconButton(
-                icon: new Icon(Icons.face),
-                onPressed: getSticker,
-                color: primaryColor,
-              ),
-            ),
-            color: Colors.white,
-          ),
-
-          // Edit text
-          Flexible(
             child: Container(
-              child: TextField(
-                style: TextStyle(color: primaryColor, fontSize: 15.0),
-                controller: textEditingController,
-                decoration: InputDecoration.collapsed(
-                  hintText: 'Type your message...',
-                  hintStyle: TextStyle(color: greyColor),
-                ),
-                focusNode: focusNode,
-              ),
-            ),
-          ),
-
-          // Button send message
-          Material(
-            child: new Container(
-              margin: new EdgeInsets.symmetric(horizontal: 8.0),
-              child: new IconButton(
-                icon: new Icon(Icons.send),
-                onPressed: () => onSendMessage(textEditingController.text, 0),
+              margin: EdgeInsets.symmetric(horizontal: 1.0),
+              child: IconButton(
+                icon: Icon(Icons.pets),
+                onPressed: getSticker,
                 color: primaryColor,
               ),
             ),
@@ -580,9 +479,9 @@ class ChatScreenState extends State<ChatScreen> {
       ),
       width: double.infinity,
       height: 50.0,
-      decoration: new BoxDecoration(
+      decoration: BoxDecoration(
           border:
-              new Border(top: new BorderSide(color: greyColor2, width: 0.5)),
+              Border(top: BorderSide(color: greyColor2, width: 0.5)),
           color: Colors.white),
     );
   }
