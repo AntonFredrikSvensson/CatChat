@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cat_chat/Screens/messageItem.dart';
 import 'package:cat_chat/const.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -25,6 +26,8 @@ class MessageList extends StatefulWidget {
 
 class _MessageListState extends State<MessageList> {
   var messageList;
+  bool isLastMessageRight;
+  bool isLastMessageLeft;
   @override
   Widget build(BuildContext context) {
     return Flexible(
@@ -50,9 +53,15 @@ class _MessageListState extends State<MessageList> {
                   messageList = snapshot.data.documents;
                   return ListView.builder(
                     padding: EdgeInsets.all(10.0),
-                    itemBuilder: (context, index) => buildItem(
-                        index, snapshot.data.documents[index], widget.id),
-                    itemCount: snapshot.data.documents.length,
+
+                    itemCount:snapshot.data.documents.length,
+                    itemBuilder:(context, index){
+                    isLastMessageRight = _isLastMessageRight(index);
+                    isLastMessageLeft = _isLastMessageLeft(index);
+                    // return buildItem(index, snapshot.data.documents[index], widget.id, isLastMessageRight,isLastMessageLeft);
+                    return  MessageItem(index: index, document: messageList[index], id:widget.id, isLastMessageLeft: isLastMessageLeft, isLastMessageRight: isLastMessageRight,);
+                    //this.index, this.document, this.id, this.isLastMessageLeft, this.isLastMessageRight, this.peerAvatar
+                    },
                     reverse: true,
                     controller: widget.listScrollController,
                   );
@@ -62,7 +71,7 @@ class _MessageListState extends State<MessageList> {
     );
   }
 
-  Widget buildItem(int index, DocumentSnapshot document, String id) {
+  Widget buildItem(int index, DocumentSnapshot document, String id, bool isLastMessageRight, bool isLastMessageLeft) {
     if (document['idFrom'] == id) {
       // Right (my message)
       return Row(
@@ -75,7 +84,7 @@ class _MessageListState extends State<MessageList> {
               fit: BoxFit.cover,
             ),
             margin: EdgeInsets.only(
-                bottom: isLastMessageRight(index) ? 20.0 : 10.0, right: 10.0),
+                bottom: isLastMessageRight ? 20.0 : 10.0, right: 10.0),
           ),
         ],
         mainAxisAlignment: MainAxisAlignment.end,
@@ -87,7 +96,7 @@ class _MessageListState extends State<MessageList> {
           children: <Widget>[
             Row(
               children: <Widget>[
-                isLastMessageLeft(index)
+                isLastMessageLeft
                     ? Material(
                         child: CachedNetworkImage(
                           placeholder: (context, url) => Container(
@@ -119,14 +128,14 @@ class _MessageListState extends State<MessageList> {
                     fit: BoxFit.cover,
                   ),
                   margin: EdgeInsets.only(
-                      bottom: isLastMessageRight(index) ? 20.0 : 10.0,
+                      bottom: isLastMessageRight ? 20.0 : 10.0,
                       right: 10.0),
                 ),
               ],
             ),
 
             // Time
-            isLastMessageLeft(index)
+            isLastMessageLeft
                 ? Container(
                     child: Text(
                       DateFormat('dd MMM kk:mm').format(
@@ -148,7 +157,7 @@ class _MessageListState extends State<MessageList> {
     }
   }
 
-  bool isLastMessageLeft(int index) {
+  bool _isLastMessageLeft(int index) {
     if ((index > 0 &&
             messageList != null &&
             messageList[index - 1]['idFrom'] == widget.id) ||
@@ -159,7 +168,7 @@ class _MessageListState extends State<MessageList> {
     }
   }
 
-  bool isLastMessageRight(int index) {
+  bool _isLastMessageRight(int index) {
     if ((index > 0 &&
             messageList != null &&
             messageList[index - 1]['idFrom'] != widget.id) ||
